@@ -1,57 +1,155 @@
-# React + TypeScript + Vite
+# Legal Expert - SaaS Legal Practice Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive full-stack SaaS application for legal practice management, built with modern technologies and clean architecture principles.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **User Authentication**: Secure JWT-based authentication system
+- **Customer Management**: Complete CRUD operations for managing clients
+- **Matter Management**: Track and manage legal matters for each customer
+- **Role-based Access**: Secure access control for different user types
+- **RESTful API**: Well-structured API with proper error handling
+- **Modern UI**: Responsive React frontend with Tailwind CSS
 
-## Expanding the ESLint configuration
+## 🏗️ Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Backend (.NET 9 API)
+- **Clean Architecture**: Organized with interfaces in dedicated folders
+- **Repository Pattern**: Abstracted data access layer
+- **Service Layer**: Business logic separation
+- **Entity Framework Core**: In-memory database for development
+- **JWT Authentication**: Secure token-based authentication
+- **Unit Tests**: Comprehensive service layer testing
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Frontend (React + TypeScript)
+- **React 18**: Modern React with hooks and functional components
+- **TypeScript**: Full type safety throughout the application
+- **Vite**: Fast development server and build tool
+- **Tailwind CSS**: Utility-first CSS framework
+- **Zustand**: Lightweight state management
+
+## 📁 Project Structure
+
+```
+legal-expert/
+├── api/                           # Backend API (.NET 9)
+│   ├── Controllers/              # API controllers
+│   ├── Services/
+│   │   ├── Interfaces/           # Service interfaces
+│   │   └── *.cs                  # Service implementations
+│   ├── Repositories/
+│   │   ├── Interfaces/           # Repository interfaces
+│   │   └── *.cs                  # Repository implementations
+│   ├── Models/                   # Entity models
+│   ├── DTOs/                     # Data transfer objects
+│   └── Data/                     # Database context
+├── LegalSaasApi.Tests/           # Unit tests (Service layer only)
+└── src/                          # Frontend React app
+    ├── components/               # Reusable UI components
+    ├── pages/                    # Page components
+    ├── stores/                   # State management
+    └── utils/                    # Utility functions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Technologies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Backend:**
+- .NET 9
+- ASP.NET Core Web API
+- Entity Framework Core (In-Memory)
+- JWT Authentication
+- BCrypt for password hashing
+- XUnit for testing
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+**Frontend:**
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Axios for API calls
+- Zustand for state management
+
+## 🚦 Getting Started
+
+### Prerequisites
+- .NET 9 SDK
+- Node.js 18+
+- Git
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/linhndg/legal-expert.git
+   cd legal-expert
+   ```
+
+2. **Install frontend dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the application**
+   ```bash
+   # Start both frontend and backend
+   npm run dev
+   ```
+
+   Or run them separately:
+
+   **Backend API:**
+   ```bash
+   cd api
+   dotnet run
+   ```
+
+   **Frontend:**
+   ```bash
+   npm run client:dev
+   ```
+
+### 🌐 Access Points
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:5207
+- **API Documentation**: http://localhost:5207/swagger
+
+## 🧪 Testing
+
+Run the service layer unit tests:
+```bash
+cd LegalSaasApi.Tests
+dotnet test
 ```
+
+## 📝 API Endpoints
+
+### Authentication
+- `POST /api/auth/signup` - Register a new user
+- `POST /api/auth/login` - User login
+
+### Customers
+- `GET /api/customers` - Get all customers
+- `GET /api/customers/{id}` - Get customer by ID
+- `POST /api/customers` - Create new customer
+- `PUT /api/customers/{id}` - Update customer
+- `DELETE /api/customers/{id}` - Delete customer
+
+### Matters
+- `GET /api/customers/{customerId}/matters` - Get matters for customer
+- `GET /api/customers/{customerId}/matters/{id}` - Get specific matter
+- `POST /api/customers/{customerId}/matters` - Create new matter
+- `PUT /api/customers/{customerId}/matters/{id}` - Update matter
+- `DELETE /api/customers/{customerId}/matters/{id}` - Delete matter
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
