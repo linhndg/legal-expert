@@ -51,15 +51,23 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     try {
-      setErrors({}); // Clear previous errors
-      
-      if (loginType === 'customer') {
-        // Handle customer login
+      if (loginType === 'law-firm') {
+        // Use auth store for law firm login
+        await login(email, password);
+        navigate('/dashboard');
+      } else {
+        // Direct API call for customer login
         console.log('Attempting customer login with:', { email });
-        const response = await axios.post('/api/customer/login', { email, password });
+        
+        const response = await axios.post('/api/customer/login', {
+          email,
+          password
+        });
         
         console.log('Customer login response:', response.data);
         
@@ -69,26 +77,12 @@ export default function Login() {
         
         // Redirect to customer portal
         navigate('/customer-portal');
-        return;
-      }
-      
-      // Handle law firm login
-      const result = await login(email, password);
-      
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        setErrors({ general: result.error });
       }
     } catch (error: any) {
       console.error('Login error:', error);
       
-      if (loginType === 'customer') {
-        if (error.response?.status === 400) {
-          setErrors({ general: 'Invalid email or password' });
-        } else {
-          setErrors({ general: 'Customer login failed. Please try again.' });
-        }
+      if (error.response?.status === 400 || error.response?.status === 401) {
+        setErrors({ general: 'Invalid email or password' });
       } else {
         setErrors({ general: 'Login failed. Please try again.' });
       }

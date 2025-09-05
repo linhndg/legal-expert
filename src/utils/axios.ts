@@ -1,28 +1,30 @@
 import axios from 'axios';
+import { APP_CONFIG, STORAGE_KEYS } from '@/constants';
 
-// Create axios instance with base configuration
-const api = axios.create({
-  baseURL: 'http://localhost:5207',
+// Create axios instance
+const axiosInstance = axios.create({
+  baseURL: APP_CONFIG.API_BASE_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // Request interceptor to add auth token
-api.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => {
     // Check for customer token first
-    const customerToken = localStorage.getItem('customerToken');
+    const customerToken = localStorage.getItem(STORAGE_KEYS.CUSTOMER_TOKEN);
     if (customerToken) {
       config.headers.Authorization = `Bearer ${customerToken}`;
       return config;
     }
 
-    // Then check for law firm token
-    const token = localStorage.getItem('auth-storage');
-    if (token) {
+    // Then check for law firm token (stored in zustand persist)
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
       try {
-        const authData = JSON.parse(token);
+        const authData = JSON.parse(authStorage);
         if (authData.state?.token) {
           config.headers.Authorization = `Bearer ${authData.state.token}`;
         }
@@ -30,6 +32,7 @@ api.interceptors.request.use(
         console.error('Error parsing auth token:', error);
       }
     }
+    
     return config;
   },
   (error) => {
@@ -38,63 +41,31 @@ api.interceptors.request.use(
 );
 
 // Response interceptor to handle auth errors
-api.interceptors.response.use(
-  (response) => response,
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       // Check if this is a customer request
-      const customerToken = localStorage.getItem('customerToken');
+      const customerToken = localStorage.getItem(STORAGE_KEYS.CUSTOMER_TOKEN);
       if (customerToken) {
-        // Clear customer auth data and redirect to customer login
-        localStorage.removeItem('customerToken');
-        localStorage.removeItem('customerData');
-        window.location.href = '/customer-login';
+        // Clear customer auth data
+        localStorage.removeItem(STORAGE_KEYS.CUSTOMER_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.CUSTOMER_DATA);
       } else {
-        // Clear law firm auth data and redirect to login
+        // Clear law firm auth data
         localStorage.removeItem('auth-storage');
+      }
+      
+      // Redirect to login if not already there
+      if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
+    
     return Promise.reject(error);
   }
 );
 
-export default api;
-
-// Set axios defaults for the entire app
-axios.defaults.baseURL = 'http://localhost:5207';
-axios.defaults.headers.common['Content-Type'] = 'application/json';
-
-// Add request interceptor to default axios instance as well
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth-storage');
-    if (token) {
-      try {
-        const authData = JSON.parse(token);
-        if (authData.state?.token) {
-          config.headers.Authorization = `Bearer ${authData.state.token}`;
-        }
-      } catch (error) {
-        console.error('Error parsing auth token:', error);
-      }
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to default axios instance
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+export default axiosInstance;
