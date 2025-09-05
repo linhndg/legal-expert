@@ -2,6 +2,8 @@
 
 A comprehensive full-stack SaaS application for legal practice management, built with modern technologies and clean architecture principles.
 
+> 📋 **For detailed technical specifications and product requirements, please see the [documents](./documents) folder.**
+
 ## 🚀 Features
 
 - **User Authentication**: Secure JWT-based authentication system
@@ -141,15 +143,3 @@ dotnet test
 - `POST /api/customers/{customerId}/matters` - Create new matter
 - `PUT /api/customers/{customerId}/matters/{id}` - Update matter
 - `DELETE /api/customers/{customerId}/matters/{id}` - Delete matter
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
