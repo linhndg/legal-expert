@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { APP_CONFIG, STORAGE_KEYS } from '@/constants';
+// import { APP_CONFIG, STORAGE_KEYS } from '@/constants';
 
 // Create axios instance
 const axiosInstance = axios.create({
-  baseURL: APP_CONFIG.API_BASE_URL,
+  baseURL: 'http://localhost:5207', // APP_CONFIG.API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // Check for customer token first
-    const customerToken = localStorage.getItem(STORAGE_KEYS.CUSTOMER_TOKEN);
+    const customerToken = localStorage.getItem('customerToken');
     if (customerToken) {
       config.headers.Authorization = `Bearer ${customerToken}`;
       return config;
@@ -48,11 +48,11 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Check if this is a customer request
-      const customerToken = localStorage.getItem(STORAGE_KEYS.CUSTOMER_TOKEN);
+      const customerToken = localStorage.getItem('customerToken');
       if (customerToken) {
         // Clear customer auth data
-        localStorage.removeItem(STORAGE_KEYS.CUSTOMER_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.CUSTOMER_DATA);
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('customerData');
       } else {
         // Clear law firm auth data
         localStorage.removeItem('auth-storage');
