@@ -51,6 +51,33 @@ namespace LegalSaasApi.DTOs
         public UserDto User { get; set; } = null!;
     }
 
+    public class CustomerLoginDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class CustomerAuthResponseDto
+    {
+        public string Token { get; set; } = string.Empty;
+        public CustomerPortalDto Customer { get; set; } = null!;
+    }
+
+    public class CustomerPortalDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string? Address { get; set; }
+        public DateTime? LastLogin { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
     public class UserDto
     {
         public Guid Id { get; set; }

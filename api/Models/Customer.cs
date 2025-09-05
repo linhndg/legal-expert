@@ -28,6 +28,16 @@ namespace LegalSaasApi.Models
         [MaxLength(255)]
         public string? Email { get; set; }
 
+        [Column("password_hash")]
+        [MaxLength(255)]
+        public string? PasswordHash { get; set; }
+
+        [Column("is_portal_enabled")]
+        public bool IsPortalEnabled { get; set; } = false;
+
+        [Column("last_login")]
+        public DateTime? LastLogin { get; set; }
+
         [Column("address")]
         public string? Address { get; set; }
 

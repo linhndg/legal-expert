@@ -16,6 +16,11 @@ namespace LegalSaasApi.DTOs
         public string? Address { get; set; }
 
         public string? Notes { get; set; }
+
+        [MinLength(6)]
+        public string? Password { get; set; }
+
+        public bool EnablePortalAccess { get; set; } = false;
     }
 
     public class UpdateCustomerDto
@@ -32,6 +37,11 @@ namespace LegalSaasApi.DTOs
         public string? Address { get; set; }
 
         public string? Notes { get; set; }
+
+        [MinLength(6)]
+        public string? Password { get; set; }
+
+        public bool? EnablePortalAccess { get; set; }
     }
 
     public class CustomerDto
@@ -42,6 +52,8 @@ namespace LegalSaasApi.DTOs
         public string? Email { get; set; }
         public string? Address { get; set; }
         public string? Notes { get; set; }
+        public bool IsPortalEnabled { get; set; }
+        public DateTime? LastLogin { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public int MattersCount { get; set; }

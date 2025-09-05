@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, LogOut } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 
 interface CustomerFormData {
@@ -9,10 +10,14 @@ interface CustomerFormData {
   phoneNumber: string;
   address: string;
   notes: string;
+  password: string;
+  enablePortalAccess: boolean;
 }
 
 interface Customer extends CustomerFormData {
   id: string;
+  isPortalEnabled: boolean;
+  lastLogin?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +25,7 @@ interface Customer extends CustomerFormData {
 export default function CustomerForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { logout } = useAuthStore();
   const isEditing = Boolean(id);
   
   const [formData, setFormData] = useState<CustomerFormData>({
@@ -27,7 +33,9 @@ export default function CustomerForm() {
     email: '',
     phoneNumber: '',
     address: '',
-    notes: ''
+    notes: '',
+    password: '',
+    enablePortalAccess: false
   });
   
   const [errors, setErrors] = useState<Partial<CustomerFormData>>({});
@@ -50,7 +58,9 @@ export default function CustomerForm() {
         email: customer.email,
         phoneNumber: customer.phoneNumber,
         address: customer.address,
-        notes: customer.notes
+        notes: customer.notes,
+        password: '', // Don't populate password when editing
+        enablePortalAccess: customer.isPortalEnabled || false
       });
     } catch (error) {
       console.error('Failed to fetch customer:', error);
@@ -76,6 +86,14 @@ export default function CustomerForm() {
 
     if (formData.phoneNumber && !/^[\d\s\-\(\)\+]+$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Please enter a valid phone number';
+    }
+
+    if (formData.enablePortalAccess) {
+      if (!formData.password.trim()) {
+        newErrors.password = 'Password is required when portal access is enabled';
+      } else if (formData.password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters long';
+      }
     }
 
     setErrors(newErrors);
@@ -118,13 +136,23 @@ export default function CustomerForm() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
     
     // Clear error when user starts typing
     if (errors[name as keyof CustomerFormData]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   if (isLoading) {
@@ -143,21 +171,30 @@ export default function CustomerForm() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center py-6">
-            <button
-              onClick={() => navigate('/customers')}
-              className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isEditing ? 'Edit Customer' : 'Add New Customer'}
-              </h1>
-              <p className="text-gray-600">
-                {isEditing ? 'Update customer information' : 'Enter customer details'}
-              </p>
+          <div className="flex items-center justify-between py-6">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/customers')}
+                className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {isEditing ? 'Edit Customer' : 'Add New Customer'}
+                </h1>
+                <p className="text-gray-600">
+                  {isEditing ? 'Update customer information' : 'Enter customer details'}
+                </p>
+              </div>
             </div>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>
@@ -258,6 +295,51 @@ export default function CustomerForm() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Additional notes about the customer..."
               />
+            </div>
+
+            {/* Portal Access */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Customer Portal Access</h3>
+              
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="enablePortalAccess"
+                  name="enablePortalAccess"
+                  checked={formData.enablePortalAccess}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="enablePortalAccess" className="ml-2 block text-sm text-gray-900">
+                  Enable customer portal access
+                </label>
+              </div>
+
+              {formData.enablePortalAccess && (
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Portal Password *
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter a secure password for customer login"
+                    minLength={6}
+                  />
+                  {errors.password && (
+                    <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                  )}
+                  <p className="mt-1 text-sm text-gray-500">
+                    Customer will use their email and this password to access their portal
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Form Actions */}

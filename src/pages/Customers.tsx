@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Plus, Edit, Trash2, Phone, Mail, FileText } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, Plus, Edit, Trash2, Phone, Mail, FileText, LogOut } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 
 interface Customer {
@@ -16,6 +17,8 @@ interface Customer {
 }
 
 export default function Customers() {
+  const { logout } = useAuthStore();
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,6 +82,11 @@ export default function Customers() {
     });
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -100,13 +108,22 @@ export default function Customers() {
               <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
               <p className="text-gray-600">Manage your client relationships</p>
             </div>
-            <Link
-              to="/customers/new"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Customer</span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/customers/new"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Customer</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

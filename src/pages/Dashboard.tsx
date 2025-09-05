@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import { Users, FileText, Plus, TrendingUp } from 'lucide-react';
+import { Users, FileText, Plus, TrendingUp, LogOut } from 'lucide-react';
 import axios from 'axios';
 
 interface Customer {
@@ -30,7 +30,8 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalMatters: 0,
@@ -78,6 +79,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -122,7 +128,7 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-gray-600">Welcome back, {user?.firstName}!</p>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex items-center space-x-4">
               <Link
                 to="/customers/new"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
@@ -130,6 +136,13 @@ export default function Dashboard() {
                 <Plus className="w-4 h-4" />
                 <span>New Customer</span>
               </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </div>

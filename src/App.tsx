@@ -8,17 +8,36 @@ import Customers from './pages/Customers';
 import CustomerForm from './pages/CustomerForm';
 import Matters from './pages/Matters';
 import MatterForm from './pages/MatterForm';
+import CustomerPortal from './pages/CustomerPortal';
 
-// Protected Route Component
+// Protected Route Component for regular users
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
   return token ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-// Public Route Component (redirect to dashboard if already logged in)
+// Protected Route Component for customers
+function CustomerProtectedRoute({ children }: { children: React.ReactNode }) {
+  const customerToken = localStorage.getItem('customerToken');
+  return customerToken ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+// Public Route Component (redirect based on token type)
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
-  return !token ? <>{children}</> : <Navigate to="/dashboard" replace />;
+  const customerToken = localStorage.getItem('customerToken');
+  
+  // If user has law firm token, redirect to dashboard
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // If customer has token, redirect to customer portal
+  if (customerToken) {
+    return <Navigate to="/customer-portal" replace />;
+  }
+  
+  return <>{children}</>;
 }
 
 function App() {
@@ -36,6 +55,13 @@ function App() {
             <PublicRoute>
               <Signup />
             </PublicRoute>
+          } />
+          
+          {/* Customer Routes */}
+          <Route path="/customer-portal" element={
+            <CustomerProtectedRoute>
+              <CustomerPortal />
+            </CustomerProtectedRoute>
           } />
           
           {/* Protected Routes */}

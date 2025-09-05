@@ -11,6 +11,14 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    // Check for customer token first
+    const customerToken = localStorage.getItem('customerToken');
+    if (customerToken) {
+      config.headers.Authorization = `Bearer ${customerToken}`;
+      return config;
+    }
+
+    // Then check for law firm token
     const token = localStorage.getItem('auth-storage');
     if (token) {
       try {
@@ -34,9 +42,18 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data and redirect to login
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
+      // Check if this is a customer request
+      const customerToken = localStorage.getItem('customerToken');
+      if (customerToken) {
+        // Clear customer auth data and redirect to customer login
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('customerData');
+        window.location.href = '/customer-login';
+      } else {
+        // Clear law firm auth data and redirect to login
+        localStorage.removeItem('auth-storage');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

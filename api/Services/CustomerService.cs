@@ -52,6 +52,10 @@ namespace LegalSaasApi.Services
                 Email = createDto.Email,
                 Address = createDto.Address,
                 Notes = createDto.Notes,
+                IsPortalEnabled = createDto.EnablePortalAccess,
+                PasswordHash = !string.IsNullOrEmpty(createDto.Password) && createDto.EnablePortalAccess 
+                    ? BCrypt.Net.BCrypt.HashPassword(createDto.Password) 
+                    : null,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -72,6 +76,20 @@ namespace LegalSaasApi.Services
             customer.Email = updateDto.Email;
             customer.Address = updateDto.Address;
             customer.Notes = updateDto.Notes;
+            
+            // Update portal access settings
+            if (updateDto.EnablePortalAccess.HasValue)
+            {
+                customer.IsPortalEnabled = updateDto.EnablePortalAccess.Value;
+            }
+            
+            // Update password if provided
+            if (!string.IsNullOrEmpty(updateDto.Password))
+            {
+                customer.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateDto.Password);
+                customer.IsPortalEnabled = true; // Enable portal if password is set
+            }
+            
             customer.UpdatedAt = DateTime.UtcNow;
 
             var updatedCustomer = await _customerRepository.UpdateAsync(customer);
@@ -93,6 +111,8 @@ namespace LegalSaasApi.Services
                 Email = customer.Email,
                 Address = customer.Address,
                 Notes = customer.Notes,
+                IsPortalEnabled = customer.IsPortalEnabled,
+                LastLogin = customer.LastLogin,
                 CreatedAt = customer.CreatedAt,
                 UpdatedAt = customer.UpdatedAt,
                 MattersCount = customer.Matters?.Count ?? 0

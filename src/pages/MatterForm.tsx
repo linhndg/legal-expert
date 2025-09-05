@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Calendar, LogOut } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 
 interface MatterFormData {
@@ -44,6 +45,7 @@ const statuses = [
 export default function MatterForm() {
   const navigate = useNavigate();
   const { customerId, matterId } = useParams<{ customerId: string; matterId?: string }>();
+  const { logout } = useAuthStore();
   const isEditing = Boolean(matterId);
   
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -186,6 +188,11 @@ export default function MatterForm() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -213,21 +220,30 @@ export default function MatterForm() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center py-6">
-            <button
-              onClick={() => navigate(`/customers/${customerId}/matters`)}
-              className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isEditing ? 'Edit Matter' : 'Add New Matter'}
-              </h1>
-              <p className="text-gray-600">
-                {isEditing ? 'Update matter information' : `Create a new matter for ${customer.name}`}
-              </p>
+          <div className="flex items-center justify-between py-6">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate(`/customers/${customerId}/matters`)}
+                className="mr-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {isEditing ? 'Edit Matter' : 'Add New Matter'}
+                </h1>
+                <p className="text-gray-600">
+                  {isEditing ? 'Update matter information' : `Create a new matter for ${customer.name}`}
+                </p>
+              </div>
             </div>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>

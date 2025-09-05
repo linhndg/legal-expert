@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, Edit, Trash2, Calendar, FileText, AlertCircle } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Plus, Edit, Trash2, Calendar, FileText, AlertCircle, LogOut } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 
 interface Matter {
@@ -40,6 +41,8 @@ const caseTypeColors = {
 
 export default function Matters() {
   const { customerId } = useParams<{ customerId: string }>();
+  const { logout } = useAuthStore();
+  const navigate = useNavigate();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [matters, setMatters] = useState<Matter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,6 +94,11 @@ export default function Matters() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   const formatCaseType = (caseType: string) => {
@@ -150,13 +158,22 @@ export default function Matters() {
                 <p className="text-gray-600">{customer.email}</p>
               </div>
             </div>
-            <Link
-              to={`/customers/${customerId}/matters/new`}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Matter</span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link
+                to={`/customers/${customerId}/matters/new`}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Matter</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

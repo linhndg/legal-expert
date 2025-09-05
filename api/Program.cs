@@ -46,7 +46,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -62,6 +62,7 @@ builder.Services.AddScoped<IMatterRepository, MatterRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IMatterService, MatterService>();
+builder.Services.AddScoped<ICustomerAuthService, CustomerAuthService>();
 
 var app = builder.Build();
 
@@ -70,6 +71,26 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.EnsureCreated();
+    
+    // Seed hardcoded customer for testing
+    if (!context.Customers.Any(c => c.Email == "john@test.com"))
+    {
+        var testCustomer = new LegalSaasApi.Models.Customer
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(), // Dummy user ID for testing
+            Name = "John Test Customer",
+            Email = "john@test.com",
+            PhoneNumber = "555-0123",
+            Address = "123 Test Street",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("test123"),
+            IsPortalEnabled = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        
+        context.Customers.Add(testCustomer);
+        context.SaveChanges();
+    }
 }
 
 // Configure the HTTP request pipeline

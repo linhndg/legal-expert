@@ -71,5 +71,28 @@ namespace LegalSaasApi.Repositories
             return await _context.Customers
                 .AnyAsync(c => c.Id == id && c.UserId == userId);
         }
+
+        public async Task<Customer?> GetByEmailAsync(string email)
+        {
+            return await _context.Customers
+                .Where(c => c.Email == email && c.IsPortalEnabled)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Customer?> GetByIdForPortalAsync(Guid id)
+        {
+            return await _context.Customers
+                .Where(c => c.Id == id && c.IsPortalEnabled)
+                .Include(c => c.Matters)
+                .FirstOrDefaultAsync();
+        }
+
+        // Temporary debug method
+        public async Task<List<Customer>> GetAllPortalCustomersAsync()
+        {
+            return await _context.Customers
+                .Where(c => c.IsPortalEnabled)
+                .ToListAsync();
+        }
     }
 }
