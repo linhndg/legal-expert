@@ -19,7 +19,7 @@ A comprehensive full-stack SaaS application for legal practice management, built
 - **Clean Architecture**: Organized with interfaces in dedicated folders
 - **Repository Pattern**: Abstracted data access layer
 - **Service Layer**: Business logic separation
-- **Entity Framework Core**: In-memory database for development
+- **Entity Framework Core**: In-memory database for development (PostgreSQL-compatible schema)
 - **JWT Authentication**: Secure token-based authentication
 - **Unit Tests**: Comprehensive service layer testing
 
@@ -58,7 +58,7 @@ legal-expert/
 **Backend:**
 - .NET 9
 - ASP.NET Core Web API
-- Entity Framework Core (In-Memory)
+- Entity Framework Core (In-Memory for convenience, PostgreSQL-ready schema)
 - JWT Authentication
 - BCrypt for password hashing
 - XUnit for testing
@@ -77,6 +77,9 @@ legal-expert/
 - .NET 9 SDK
 - Node.js 18+
 - Git
+
+### Database Setup
+The application currently uses **Entity Framework Core In-Memory database** for convenience and easy setup. The schema is designed to be **PostgreSQL-compatible**, allowing for easy migration to PostgreSQL in production environments without code changes.
 
 ### Installation
 
