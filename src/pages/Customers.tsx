@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Plus, Edit, Trash2, Phone, Mail, FileText, LogOut } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Phone, Mail, FileText, LogOut, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import axiosInstance from '@/utils/axios';
 
@@ -109,6 +109,13 @@ export default function Customers() {
               <p className="text-gray-600">Manage your client relationships</p>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                to="/dashboard"
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Dashboard</span>
+              </Link>
               <Link
                 to="/customers/new"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"

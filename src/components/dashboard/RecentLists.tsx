@@ -14,6 +14,7 @@ interface Customer {
 
 interface Matter {
   id: string;
+  customerId: string;
   name: string;
   caseType: string;
   status: string;
@@ -80,7 +81,9 @@ const RecentLists: React.FC<RecentListsProps> = ({ recentCustomers, recentMatter
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{customer.name}</p>
+                    <Link to={`/customers/${customer.id}/edit`} className="hover:text-blue-600 transition-colors">
+                      <p className="font-medium text-gray-900 hover:text-blue-600">{customer.name}</p>
+                    </Link>
                     <p className="text-sm text-gray-500">{customer.email}</p>
                   </div>
                 </div>
@@ -123,7 +126,9 @@ const RecentLists: React.FC<RecentListsProps> = ({ recentCustomers, recentMatter
               <div key={matter.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <p className="font-medium text-gray-900">{matter.name}</p>
+                    <Link to={`/customers/${matter.customerId}/matters/${matter.id}/edit`} className="hover:text-blue-600 transition-colors">
+                      <p className="font-medium text-gray-900 hover:text-blue-600">{matter.name}</p>
+                    </Link>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(matter.status)}`}>
                       {matter.status}
                     </span>

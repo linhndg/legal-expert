@@ -15,6 +15,7 @@ interface Customer {
 
 interface Matter {
   id: string;
+  customerId: string;
   name: string;
   caseType: string;
   status: string;
