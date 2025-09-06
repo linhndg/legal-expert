@@ -146,3 +146,24 @@ dotnet test
 - `POST /api/customers/{customerId}/matters` - Create new matter
 - `PUT /api/customers/{customerId}/matters/{id}` - Update matter
 - `DELETE /api/customers/{customerId}/matters/{id}` - Delete matter
+
+## 🚀 Deployment
+
+### Docker Deployment
+The project includes Docker configuration for easy deployment to platforms like Render.com, Railway, or any Docker-compatible hosting service.
+
+**Quick Deploy to Render.com:**
+1. Push your code to GitHub
+2. Connect your repository to Render
+3. Use the included `Dockerfile` and `render.yaml` for automatic configuration
+
+**Build and run locally with Docker:**
+```bash
+# Build the Docker image
+docker build -t legalflow .
+
+# Run the container
+docker run -p 8080:8080 legalflow
+```
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).

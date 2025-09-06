@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: legalflow
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: Jwt__Key
+        generateValue: true
+      - key: Jwt__Issuer
+        value: LegalFlow
+      - key: Jwt__Audience
+        value: LegalFlowClient

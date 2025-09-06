@@ -24,10 +24,15 @@ export default defineConfig({
     }), 
     tsconfigPaths(),
   ],
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false
+  },
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:5207',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

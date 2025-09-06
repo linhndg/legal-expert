@@ -1,9 +1,9 @@
 import axios from 'axios';
 // import { APP_CONFIG, STORAGE_KEYS } from '@/constants';
 
-// Create axios instance
+// Create axios instance with dynamic base URL
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5207', // APP_CONFIG.API_BASE_URL,
+  baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:5207/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
