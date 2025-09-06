@@ -100,13 +100,24 @@ export default function Login() {
           <p className="text-gray-600 mt-2">
             {loginType === 'customer' ? 'Sign in to your customer portal' : 'Sign in to your Legal SaaS account'}
           </p>
-          {loginType === 'customer' && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800 text-center">
-                <strong>Test Account:</strong> john@test.com / test123
-              </p>
-            </div>
-          )}
+          
+          {/* Test Credentials Display */}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm font-medium text-blue-900 mb-2 text-center">Demo Credentials:</p>
+            {loginType === 'customer' ? (
+              <div className="text-sm text-blue-800 text-center">
+                <strong>Customer Portal:</strong><br />
+                Email: john@test.com<br />
+                Password: test123
+              </div>
+            ) : (
+              <div className="text-sm text-blue-800 text-center">
+                <strong>Law Firm Admin:</strong><br />
+                Email: demo@legalflow.com<br />
+                Password: demo123
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Login Type Selection */}

@@ -82,23 +82,124 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.EnsureCreated();
     
-    // Seed hardcoded customer for testing
+    // Seed test law firm user
+    var testUserId = Guid.NewGuid();
+    if (!context.Users.Any(u => u.Email == "demo@legalflow.com"))
+    {
+        var testUser = new LegalSaasApi.Models.User
+        {
+            Id = testUserId,
+            FirstName = "LegalFlow",
+            LastName = "Demo",
+            Email = "demo@legalflow.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("demo123"),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        
+        context.Users.Add(testUser);
+        context.SaveChanges();
+    }
+    else
+    {
+        // Get existing test user ID
+        var existingUser = context.Users.First(u => u.Email == "demo@legalflow.com");
+        testUserId = existingUser.Id;
+    }
+    
+    // Seed test customer with portal access
+    var johnCustomerId = Guid.NewGuid();
     if (!context.Customers.Any(c => c.Email == "john@test.com"))
     {
-        var testCustomer = new LegalSaasApi.Models.Customer
+        var johnCustomer = new LegalSaasApi.Models.Customer
         {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(), // Dummy user ID for testing
+            Id = johnCustomerId,
+            UserId = testUserId,
             Name = "John Test Customer",
             Email = "john@test.com",
             PhoneNumber = "555-0123",
-            Address = "123 Test Street",
+            Address = "123 Test Street, Demo City, DC 12345",
+            Notes = "Demo customer account for testing the customer portal",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("test123"),
             IsPortalEnabled = true,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow.AddDays(-30),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5)
         };
         
-        context.Customers.Add(testCustomer);
+        context.Customers.Add(johnCustomer);
+        context.SaveChanges();
+    }
+    else
+    {
+        var existingCustomer = context.Customers.First(c => c.Email == "john@test.com");
+        johnCustomerId = existingCustomer.Id;
+    }
+    
+    // Seed additional test customer without portal access
+    if (!context.Customers.Any(c => c.Email == "sarah@company.com"))
+    {
+        var sarahCustomer = new LegalSaasApi.Models.Customer
+        {
+            Id = Guid.NewGuid(),
+            UserId = testUserId,
+            Name = "Sarah Business Owner",
+            Email = "sarah@company.com",
+            PhoneNumber = "555-0456",
+            Address = "456 Business Ave, Demo City, DC 12345",
+            Notes = "Corporate client for business law matters",
+            IsPortalEnabled = false,
+            CreatedAt = DateTime.UtcNow.AddDays(-45),
+            UpdatedAt = DateTime.UtcNow.AddDays(-10)
+        };
+        
+        context.Customers.Add(sarahCustomer);
+        context.SaveChanges();
+    }
+    
+    // Seed test matters for John
+    if (!context.Matters.Any(m => m.CustomerId == johnCustomerId))
+    {
+        var matters = new[]
+        {
+            new LegalSaasApi.Models.Matter
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = johnCustomerId,
+                Name = "Personal Injury Case",
+                Description = "Car accident claim against insurance company. Client injured in rear-end collision on Highway 101.",
+                CaseType = "Personal Injury",
+                Status = "Active",
+                StartDate = DateTime.UtcNow.AddDays(-25),
+                CreatedAt = DateTime.UtcNow.AddDays(-25),
+                UpdatedAt = DateTime.UtcNow.AddDays(-2)
+            },
+            new LegalSaasApi.Models.Matter
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = johnCustomerId,
+                Name = "Property Dispute Resolution",
+                Description = "Boundary dispute with neighbor regarding fence placement and property line encroachment.",
+                CaseType = "Real Estate",
+                Status = "Pending",
+                StartDate = DateTime.UtcNow.AddDays(-15),
+                CreatedAt = DateTime.UtcNow.AddDays(-15),
+                UpdatedAt = DateTime.UtcNow.AddDays(-1)
+            },
+            new LegalSaasApi.Models.Matter
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = johnCustomerId,
+                Name = "Employment Contract Review",
+                Description = "Review and negotiation of new employment contract terms and non-compete clauses.",
+                CaseType = "Employment",
+                Status = "Closed",
+                StartDate = DateTime.UtcNow.AddDays(-60),
+                CreatedAt = DateTime.UtcNow.AddDays(-60),
+                UpdatedAt = DateTime.UtcNow.AddDays(-30)
+            }
+        };
+        
+        context.Matters.AddRange(matters);
         context.SaveChanges();
     }
 }
