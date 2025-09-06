@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Eye, EyeOff, LogIn, User, Building } from 'lucide-react';
-import axios from '@/utils/axios';
+import axiosInstance from '@/utils/axios';
 
 type LoginType = 'law-firm' | 'customer';
 
@@ -64,7 +64,7 @@ export default function Login() {
         // Direct API call for customer login
         console.log('Attempting customer login with:', { email });
         
-        const response = await axios.post('/api/customer/login', {
+        const response = await axiosInstance.post('/customer/login', {
           email,
           password
         });

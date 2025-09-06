@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Lock, LogIn, ArrowLeft } from 'lucide-react';
-import axios from '@/utils/axios';
+import axiosInstance from '@/utils/axios';
 
 interface CustomerLoginForm {
   email: string;
@@ -64,7 +64,7 @@ export default function CustomerLogin() {
       setIsLoading(true);
       console.log('Attempting customer login with:', { email: formData.email });
       
-      const response = await axios.post('/api/customer/login', formData);
+      const response = await axiosInstance.post('/customer/login', formData);
       
       console.log('Customer login response:', response.data);
       
