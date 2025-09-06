@@ -107,7 +107,6 @@ export default function Dashboard() {
 
         <RecentLists
           recentCustomers={dashboardData.recentCustomers}
-          recentMatters={dashboardData.recentMatters}
         />
       </div>
     </PageLayout>
