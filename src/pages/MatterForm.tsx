@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Calendar, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 
 interface MatterFormData {
   name: string;
@@ -74,7 +74,7 @@ export default function MatterForm() {
     if (!customerId) return;
     
     try {
-      const response = await axios.get<Customer>(`/api/customers/${customerId}`);
+      const response = await axiosInstance.get<Customer>(`/customers/${customerId}`);
       setCustomer(response.data);
     } catch (error) {
       console.error('Failed to fetch customer:', error);
@@ -88,7 +88,7 @@ export default function MatterForm() {
     
     try {
       setIsLoading(true);
-      const response = await axios.get<Matter>(`/api/customers/${customerId}/matters/${matterId}`);
+      const response = await axiosInstance.get<Matter>(`/customers/${customerId}/matters/${matterId}`);
       const matter = response.data;
       setFormData({
         name: matter.name,
@@ -154,9 +154,9 @@ export default function MatterForm() {
       };
       
       if (isEditing && matterId) {
-        await axios.put(`/api/customers/${customerId}/matters/${matterId}`, submitData);
+        await axiosInstance.put(`/customers/${customerId}/matters/${matterId}`, submitData);
       } else {
-        await axios.post(`/api/customers/${customerId}/matters`, submitData);
+        await axiosInstance.post(`/customers/${customerId}/matters`, submitData);
       }
       
       navigate(`/customers/${customerId}/matters`);

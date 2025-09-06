@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Plus, Edit, Trash2, Phone, Mail, FileText, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 
 interface Customer {
   id: string;
@@ -41,13 +41,13 @@ export default function Customers() {
   const fetchCustomers = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('/api/customers');
+      const response = await axiosInstance.get('/customers');
       
       // Fetch matters count for each customer
       const customersWithMatters = await Promise.all(
         response.data.map(async (customer: Customer) => {
           try {
-            const mattersResponse = await axios.get(`/api/customers/${customer.id}/matters`);
+            const mattersResponse = await axiosInstance.get(`/customers/${customer.id}/matters`);
             return { ...customer, mattersCount: mattersResponse.data.length };
           } catch {
             return { ...customer, mattersCount: 0 };
@@ -65,7 +65,7 @@ export default function Customers() {
 
   const handleDeleteCustomer = async (customerId: string) => {
     try {
-      await axios.delete(`/api/customers/${customerId}`);
+      await axiosInstance.delete(`/customers/${customerId}`);
       setCustomers(customers.filter(c => c.id !== customerId));
       setDeleteConfirm(null);
     } catch (error) {

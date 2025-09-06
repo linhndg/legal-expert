@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Edit, Trash2, Calendar, FileText, AlertCircle, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 
 interface Matter {
   id: string;
@@ -62,8 +62,8 @@ export default function Matters() {
       
       // Fetch customer info and matters in parallel
       const [customerResponse, mattersResponse] = await Promise.all([
-        axios.get(`/api/customers/${customerId}`),
-        axios.get(`/api/customers/${customerId}/matters`)
+        axiosInstance.get(`/customers/${customerId}`),
+        axiosInstance.get(`/customers/${customerId}/matters`)
       ]);
       
       setCustomer(customerResponse.data);
@@ -79,7 +79,7 @@ export default function Matters() {
     if (!customerId) return;
     
     try {
-      await axios.delete(`/api/customers/${customerId}/matters/${matterId}`);
+      await axiosInstance.delete(`/customers/${customerId}/matters/${matterId}`);
       setMatters(matters.filter(m => m.id !== matterId));
       setDeleteConfirm(null);
     } catch (error) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 
 interface CustomerFormData {
   name: string;
@@ -51,7 +51,7 @@ export default function CustomerForm() {
   const fetchCustomer = async (customerId: string) => {
     try {
       setIsLoading(true);
-      const response = await axios.get<Customer>(`/api/customers/${customerId}`);
+      const response = await axiosInstance.get<Customer>(`/customers/${customerId}`);
       const customer = response.data;
       setFormData({
         name: customer.name,
@@ -111,9 +111,9 @@ export default function CustomerForm() {
       setIsSubmitting(true);
       
       if (isEditing && id) {
-        await axios.put(`/api/customers/${id}`, formData);
+        await axiosInstance.put(`/customers/${id}`, formData);
       } else {
-        await axios.post('/api/customers', formData);
+        await axiosInstance.post('/customers', formData);
       }
       
       navigate('/customers');
