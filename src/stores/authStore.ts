@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 
 interface User {
   id: string;
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          const response = await axios.post('http://localhost:5207/api/auth/login', {
+          const response = await axiosInstance.post('/auth/login', {
             email,
             password,
           });
@@ -55,8 +55,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
 
-          // Set default authorization header
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          // Set default authorization header for the axios instance
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
           return { success: true };
         } catch (error: any) {
@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthState>()(
       signup: async (userData) => {
         set({ isLoading: true });
         try {
-          const response = await axios.post('http://localhost:5207/api/auth/signup', userData);
+          const response = await axiosInstance.post('/auth/signup', userData);
           
           const { token, user } = response.data;
           
@@ -80,8 +80,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
 
-          // Set default authorization header
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          // Set default authorization header for the axios instance
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
           return { success: true };
         } catch (error: any) {
@@ -98,8 +98,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         });
         
-        // Remove authorization header
-        delete axios.defaults.headers.common['Authorization'];
+        // Remove authorization header from axios instance
+        delete axiosInstance.defaults.headers.common['Authorization'];
       },
 
       setUser: (user: User) => {
@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthState>()(
 
       setToken: (token: string) => {
         set({ token, isAuthenticated: true });
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       },
     }),
     {
@@ -120,7 +120,7 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state?.token) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
         }
       },
     }
