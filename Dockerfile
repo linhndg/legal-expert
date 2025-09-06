@@ -41,11 +41,11 @@ COPY --from=backend-build /app/out .
 COPY --from=frontend-build /app/dist ./wwwroot
 
 # Expose port
-EXPOSE 8080
+EXPOSE 10000
 
 # Set environment variables for production
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_URLS=http://+:10000
 
 # Start the application
 ENTRYPOINT ["dotnet", "LegalSaasApi.dll"]

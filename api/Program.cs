@@ -55,7 +55,7 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            // Production - allow all origins for now, you can restrict this later
+            // Production - allow all origins and methods
             policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
@@ -109,6 +109,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    // Enable Swagger in production for debugging
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "LegalFlow API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 // Enable static files serving for React app
 app.UseStaticFiles();
@@ -116,9 +126,18 @@ app.UseStaticFiles();
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map API controllers with explicit /api prefix
 app.MapControllers();
 
-// Fallback to serve React app for SPA routing
-app.MapFallbackToFile("index.html");
+// Add a simple health check endpoint
+app.MapGet("/api/health", () => new { status = "healthy", timestamp = DateTime.UtcNow });
+app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow });
+
+// Fallback to serve React app for SPA routing (only for non-API routes)
+app.MapFallbackToFile("index.html").Add(endpointBuilder =>
+{
+    endpointBuilder.Metadata.Add(new HttpMethodMetadata(new[] { "GET" }));
+});
 
 app.Run();
