@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import axiosInstance from '@/utils/axios';
 import { PageLayout, AppHeader } from '@/components/layout';
 import { DashboardStats, RecentLists } from '@/components/dashboard';
 
@@ -50,10 +50,14 @@ export default function Dashboard() {
     try {
       setIsLoading(true);
       
+      // Debug: Check if user is authenticated
+      const { token, isAuthenticated } = useAuthStore.getState();
+      console.log('Dashboard: Authentication status:', { isAuthenticated, hasToken: !!token });
+      
       // Simulate API calls - replace with actual endpoints
       const [customersResponse, mattersResponse] = await Promise.all([
-        axios.get('/api/customers'),
-        axios.get('/api/matters')
+        axiosInstance.get('/customers'),
+        axiosInstance.get('/matters')
       ]);
 
       const customers = customersResponse.data;

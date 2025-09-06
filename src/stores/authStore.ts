@@ -55,9 +55,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
 
-          // Set default authorization header for the axios instance
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+          // Token will be automatically added to requests via axios interceptor
           return { success: true };
         } catch (error: any) {
           set({ isLoading: false });
@@ -80,9 +78,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
 
-          // Set default authorization header for the axios instance
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+          // Token will be automatically added to requests via axios interceptor
           return { success: true };
         } catch (error: any) {
           set({ isLoading: false });
@@ -98,8 +94,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         });
         
-        // Remove authorization header from axios instance
-        delete axiosInstance.defaults.headers.common['Authorization'];
+        // Token removal will be handled by axios interceptor
       },
 
       setUser: (user: User) => {
@@ -108,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
 
       setToken: (token: string) => {
         set({ token, isAuthenticated: true });
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // Token will be automatically added to requests via axios interceptor
       },
     }),
     {
@@ -119,9 +114,8 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.token) {
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
-        }
+        // Token will be automatically added to requests via axios interceptor
+        // No need to set headers manually
       },
     }
   )
