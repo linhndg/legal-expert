@@ -54,21 +54,26 @@ export default function Dashboard() {
       const { token, isAuthenticated } = useAuthStore.getState();
       console.log('Dashboard: Authentication status:', { isAuthenticated, hasToken: !!token });
       
-      // Simulate API calls - replace with actual endpoints
-      const [customersResponse, mattersResponse] = await Promise.all([
-        axiosInstance.get('/customers'),
-        axiosInstance.get('/matters')
-      ]);
-
+      // First get all customers
+      const customersResponse = await axiosInstance.get('/customers');
       const customers = customersResponse.data;
-      const matters = mattersResponse.data;
+
+      // Then get matters for each customer
+      let allMatters: Matter[] = [];
+      if (customers.length > 0) {
+        const matterPromises = customers.map((customer: Customer) => 
+          axiosInstance.get(`/customers/${customer.id}/matters`).catch(() => ({ data: [] }))
+        );
+        const mattersResponses = await Promise.all(matterPromises);
+        allMatters = mattersResponses.flatMap(response => response.data);
+      }
 
       setDashboardData({
         totalCustomers: customers.length,
-        totalMatters: matters.length,
-        activeMatters: matters.filter((m: Matter) => m.status.toLowerCase() === 'active').length,
+        totalMatters: allMatters.length,
+        activeMatters: allMatters.filter((m: Matter) => m.status.toLowerCase() === 'active').length,
         recentCustomers: customers.slice(0, 5),
-        recentMatters: matters.slice(0, 5),
+        recentMatters: allMatters.slice(0, 5),
       });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
